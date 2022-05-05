@@ -16,8 +16,8 @@ class Login extends StatelessWidget {
           toolbarHeight: 70,
           title: const Center(
               child: Text(
-            'Login',
-            style: TextStyle(fontSize: 15),
+            'Login Page',
+            style: TextStyle(fontSize: 30),
           )),
         ),
         body: const Padding(
@@ -29,7 +29,7 @@ class Login extends StatelessWidget {
   }
 }
 
-Future<Album> createAlbum(
+Future<Data> createData(
     String username, String password, BuildContext context) async {
   final response = await http.post(
     Uri.parse('https://api.gsb.best/'),
@@ -37,7 +37,7 @@ Future<Album> createAlbum(
       'Content-Type': 'application/json; charset=UTF-8',
     },
     body: jsonEncode(<String, String>{
-      'api': 'user_open_session',
+      'api': 'all_open_session',
       'username': username,
       'password': password,
     }),
@@ -47,24 +47,24 @@ Future<Album> createAlbum(
     // If the server did return a 201 CREATED response,
     // then parse the JSON.
 
-    return Album.fromJson(jsonDecode(response.body));
+    return Data.fromJson(jsonDecode(response.body));
   } else {
     // If the server did not return a 201 CREATED response,
     // then throw an exception.
-    throw Exception('Failed to create album.');
+    throw Exception('Failed to create Data array.');
   }
 }
 
-class Album {
+class Data {
   final int id;
-  final String title;
+  final String message;
 
-  const Album({required this.id, required this.title});
+  const Data({required this.id, required this.message});
 
-  factory Album.fromJson(Map<String, dynamic> json) {
-    return Album(
+  factory Data.fromJson(Map<String, dynamic> json) {
+    return Data(
       id: json['id'],
-      title: json['message'],
+      message: json['message'],
     );
   }
 }
@@ -82,7 +82,7 @@ class _MyAppState extends State<MyApp> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _controllerUser = TextEditingController();
   final TextEditingController _controllerPassword = TextEditingController();
-  Future<Album>? _futureAlbum;
+  Future<Data>? _futureData;
 
   @override
   Widget build(BuildContext context) {
@@ -90,9 +90,13 @@ class _MyAppState extends State<MyApp> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Container(
+          margin: const EdgeInsets.only(bottom: 10.0),
+          child: Image.asset("images/logo.png", width: 160),
+        ),
+        Container(
           alignment: Alignment.center,
           padding: const EdgeInsets.all(8.0),
-          child: (_futureAlbum == null) ? buildColumn() : buildFutureBuilder(),
+          child: (_futureData == null) ? buildColumn() : buildFutureBuilder(),
         ),
       ],
     );
@@ -124,63 +128,55 @@ class _MyAppState extends State<MyApp> {
                 }
                 return null;
               }),
-          ElevatedButton(
-            onPressed: () {
-              if (_formKey.currentState!.validate()) {
-                setState(() {
-                  _futureAlbum = createAlbum(
-                      _controllerUser.text, _controllerPassword.text, context);
-                });
-              }
-            },
-            child: const Text('Log in'),
+          Container(
+            margin: const EdgeInsets.only(top: 10.0),
+            child: ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  setState(() {
+                    _futureData = createData(_controllerUser.text,
+                        _controllerPassword.text, context);
+                  });
+                }
+              },
+              child: const Text('Sign in'),
+            ),
           ),
         ],
       ),
     );
   }
 
-  FutureBuilder<Album> buildFutureBuilder() {
-    return FutureBuilder<Album>(
-      future: _futureAlbum,
+  FutureBuilder<Data> buildFutureBuilder() {
+    return FutureBuilder<Data>(
+      future: _futureData,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          if (snapshot.data?.title == 'Good password') {
-            return Column(
-              children: [
-                Text('Welcome !'),
-                ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => Principale()));
-                    },
-                    child: Text("Page d'accueil")),
-                ElevatedButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(context,
-                          MaterialPageRoute(builder: (context) => Login()));
-                    },
-                    style: ElevatedButton.styleFrom(primary: Colors.red),
-                    child: Text('Se déconnecter')),
-              ],
-            );
+          if (snapshot.data?.message == 'Good password') {
+            //Automatical redirect
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => Principale()));
+            });
           } else {
             return Column(
               children: [
                 Text('Bad User or Password'),
-                ElevatedButton(
+                Container(
+                  margin: const EdgeInsets.only(top: 10.0),
+                  child: ElevatedButton(
                     onPressed: () {
                       Navigator.pushReplacement(context,
                           MaterialPageRoute(builder: (context) => Login()));
                     },
-                    child: Text('Retry')),
+                    child: Text('Go back'),
+                  ),
+                ),
               ],
             );
           }
 
-          return Text(snapshot.data!.title);
+          return Text(snapshot.data!.message);
         } else if (snapshot.hasError) {
           return Text('${snapshot.error}');
         }
@@ -195,7 +191,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   MyCustomFormState createState() {
-    return MyCustomFormState();
+	return MyCustomFormState();
   }
 }
 
@@ -211,70 +207,70 @@ class MyCustomFormState extends State<MyCustomForm> {
 
   @override
   Widget build(BuildContext context) {
-    // Build a Form widget using the _formKey created above.
-    return Form(
-      key: _formKey,
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Padding(
-              padding: EdgeInsets.all(20.0),
-              child: Text(
-                'Se connecter',
-                style: kTitreLogin,
-              ),
-            ),
-            TextFormField(
-              decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Username',
-                  isDense: true,
-                  constraints: BoxConstraints(maxWidth: 500)),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your Username';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(
-              height: 25,
-            ),
-            TextFormField(
-              obscureText: true,
-              decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Password',
-                  constraints: BoxConstraints(maxWidth: 500)),
-              // The validator receives the text that the user has entered.
+	// Build a Form widget using the _formKey created above.
+	return Form(
+	  key: _formKey,
+	  child: Center(
+		child: Column(
+		  mainAxisAlignment: MainAxisAlignment.center,
+		  children: [
+			const Padding(
+			  padding: EdgeInsets.all(20.0),
+			  child: Text(
+				'Se connecter',
+				style: kTitreLogin,
+			  ),
+			),
+			TextFormField(
+			  decoration: const InputDecoration(
+				  border: OutlineInputBorder(),
+				  labelText: 'Username',
+				  isDense: true,
+				  constraints: BoxConstraints(maxWidth: 500)),
+			  validator: (value) {
+				if (value == null || value.isEmpty) {
+				  return 'Please enter your Username';
+				}
+				return null;
+			  },
+			),
+			const SizedBox(
+			  height: 25,
+			),
+			TextFormField(
+			  obscureText: true,
+			  decoration: const InputDecoration(
+				  border: OutlineInputBorder(),
+				  labelText: 'Password',
+				  constraints: BoxConstraints(maxWidth: 500)),
+			  // The validator receives the text that the user has entered.
 
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter a password';
-                }
-                return null;
-              },
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: ElevatedButton(
-                onPressed: () {
-                  // Validate returns true if the form is valid, or false otherwise.
-                  if (_formKey.currentState!.validate()) {
-                    // If the form is valid, display a snackbar. In the real world,
-                    // you'd often call a server or save the information in a database
+			  validator: (value) {
+				if (value == null || value.isEmpty) {
+				  return 'Please enter a password';
+				}
+				return null;
+			  },
+			),
+			Padding(
+			  padding: const EdgeInsets.symmetric(vertical: 16.0),
+			  child: ElevatedButton(
+				onPressed: () {
+				  // Validate returns true if the form is valid, or false otherwise.
+				  if (_formKey.currentState!.validate()) {
+					// If the form is valid, display a snackbar. In the real world,
+					// you'd often call a server or save the information in a database
 
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Principale()));
-                  }
-                },
-                child: const Text('Submit'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+					Navigator.push(context,
+						MaterialPageRoute(builder: (context) => Principale()));
+				  }
+				},
+				child: const Text('Submit'),
+			  ),
+			),
+		  ],
+		),
+	  ),
+	);
   }
 } */

@@ -1,10 +1,10 @@
 // ignore_for_file: must_be_immutable
 
 import 'package:flutter/material.dart';
-import 'package:mobile/login.dart';
 import 'package:lottie/lottie.dart';
-import 'constants.dart';
-import 'notes_de_frais.dart';
+import 'package:mobile/login.dart';
+import 'package:mobile/constants.dart';
+import 'package:mobile/notes_de_frais.dart';
 
 void main() {
   runApp(
