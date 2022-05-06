@@ -5,10 +5,10 @@ import 'package:lottie/lottie.dart';
 import 'package:mobile/login.dart';
 import 'package:mobile/constants.dart';
 import 'package:mobile/notes_de_frais.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile/feesheets_list.dart';
+// import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-final storage = new FlutterSecureStorage();
-String valuePhpSession = storage.read(key: 'PHPSession').toString();
+// final storage = new FlutterSecureStorage();
 
 void main() {
   runApp(
@@ -18,66 +18,10 @@ void main() {
       initialRoute: '/',
       routes: {
         '/home': (context) => const Login(),
-        '/connected': (context) => Principale()
+        '/connected': (context) => Principale(php_session_id: 'none')
       },
     ),
   );
-}
-
-class Principale extends StatelessWidget {
-  var scaffoldKey = GlobalKey<ScaffoldState>();
-
-  Principale({Key? key}) : super(key: key);
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    var valuePhpSession = storage.read(key: 'PHPSession');
-    return Scaffold(
-      key: scaffoldKey,
-      drawer: const SizedBox(
-        width: 500,
-        child: Drawer(
-          child: DrawerContent(),
-        ),
-      ),
-      appBar: AppBar(
-        toolbarHeight: 70,
-        actions: [
-          IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: const Icon(Icons.logout_rounded),
-          )
-        ],
-        title: Text(
-          valuePhpSession.toString(),
-        ),
-      ),
-      body: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => Feesheets()),
-          );
-        },
-        child: Container(
-          decoration: BoxDecoration(
-              border: Border.all(color: Colors.blue),
-              borderRadius: BorderRadius.circular(6)),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Lottie.asset('assets/images/67210-writing-blue-bg.json',
-                  frameRate: FrameRate(30)),
-              const Text(
-                'Créer une note de frais',
-                style: kTitreLogin,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 class DrawerContent extends StatelessWidget {
@@ -92,11 +36,11 @@ class DrawerContent extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         module(
-            page: Principale(),
+            page: Principale(php_session_id: 'none'),
             text: 'Mes notes de frais en cours',
             asset: 'assets/images/pen.json'),
         module(
-            page: Principale(),
+            page: Principale(php_session_id: 'none'),
             text: 'Notes de frais archivées',
             asset: 'assets/images/dossier.json'),
       ],

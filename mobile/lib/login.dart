@@ -1,10 +1,11 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter/material.dart';
 import 'package:mobile/constants.dart';
-import 'package:mobile/main.dart';
+// import 'package:mobile/main.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+// import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:mobile/feesheets_list.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
@@ -47,13 +48,15 @@ void createData(String username, String password, BuildContext context) async {
   if (response.statusCode == 200) {
     // debugPrint(jsonDecode(response.body)["message"]);
     if (jsonDecode(response.body)["message"] == 'Good password') {
+      String php_session_id = jsonDecode(response.body)["php_session_id"];
       //Automatical redirect
-      await storage.write(
-          key: 'PHPSession',
-          value: jsonDecode(response.body)["php_session_id"]);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => Principale()));
+            context,
+            MaterialPageRoute(
+                builder: (context) => Principale(
+                      php_session_id: php_session_id,
+                    )));
       });
     } else {
       Fluttertoast.showToast(
@@ -147,7 +150,6 @@ class _MyAppState extends State<MyApp> {
                   setState(() {
                     createData(_controllerUser.text, _controllerPassword.text,
                         context);
-                    // debugPrint(_futureData.toString());
                   });
                 }
               },
