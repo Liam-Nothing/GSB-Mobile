@@ -5,6 +5,10 @@ import 'package:lottie/lottie.dart';
 import 'package:mobile/login.dart';
 import 'package:mobile/constants.dart';
 import 'package:mobile/notes_de_frais.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+final storage = new FlutterSecureStorage();
+String valuePhpSession = storage.read(key: 'PHPSession').toString();
 
 void main() {
   runApp(
@@ -27,6 +31,7 @@ class Principale extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    var valuePhpSession = storage.read(key: 'PHPSession');
     return Scaffold(
       key: scaffoldKey,
       drawer: const SizedBox(
@@ -43,8 +48,8 @@ class Principale extends StatelessWidget {
             icon: const Icon(Icons.logout_rounded),
           )
         ],
-        title: const Text(
-          'Notes de frais',
+        title: Text(
+          valuePhpSession.toString(),
         ),
       ),
       body: GestureDetector(

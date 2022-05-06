@@ -1,11 +1,10 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:mobile/constants.dart';
 import 'package:mobile/main.dart';
-// import 'package:flutter/foundation.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class Login extends StatelessWidget {
   const Login({Key? key}) : super(key: key);
@@ -14,14 +13,15 @@ class Login extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        // appBar: AppBar(
-        //   toolbarHeight: 70,
-        //   title: const Center(
-        //       child: Text(
-        //     'Login Page',
-        //     style: TextStyle(fontSize: 30),
-        //   )),
-        // ),
+        appBar: AppBar(
+          toolbarHeight: 00,
+          //   toolbarHeight: 70,
+          //   title: const Center(
+          //       child: Text(
+          //     'Login Page',
+          //     style: TextStyle(fontSize: 30),
+          //   )),
+        ),
         body: const Padding(
           padding: EdgeInsets.all(20.0),
           child: MyApp(),
@@ -48,6 +48,9 @@ void createData(String username, String password, BuildContext context) async {
     // debugPrint(jsonDecode(response.body)["message"]);
     if (jsonDecode(response.body)["message"] == 'Good password') {
       //Automatical redirect
+      await storage.write(
+          key: 'PHPSession',
+          value: jsonDecode(response.body)["php_session_id"]);
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => Principale()));
@@ -64,8 +67,6 @@ void createData(String username, String password, BuildContext context) async {
         textColor: Colors.white,
       );
     }
-
-    // return Data.fromJson(jsonDecode(response.body));
   } else {
     Fluttertoast.showToast(
       msg: "Failed to create Data array.",
@@ -123,7 +124,7 @@ class _MyAppState extends State<MyApp> {
               decoration: field('Username'),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Enter a username, please';
+                  return 'Enter a username please.';
                 }
                 return null;
               }),
@@ -134,7 +135,7 @@ class _MyAppState extends State<MyApp> {
               decoration: field('Password'),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Enter a password, please';
+                  return 'Enter a password please.';
                 }
                 return null;
               }),
