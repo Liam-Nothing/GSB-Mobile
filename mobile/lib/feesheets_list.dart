@@ -22,11 +22,17 @@ class Principale extends StatelessWidget {
     //php_session_id print
     debugPrint('Key is : ' + php_session_id);
 
-    final String jsonSample = GetFeesheets(php_session_id).toString();
+    final String jsonSample = '[{"id":1},{"id":2}]';
 
     var json = jsonDecode(jsonSample);
     // var json = (GetFeesheets(php_session_id));
-    debugPrint(jsonSample);
+    // debugPrint(jsonSample);
+
+    var TEST_VAR_PHDFG = fetch(php_session_id);
+
+    print(TEST_VAR_PHDFG);
+    print("====>");
+    print(TEST_VAR_PHDFG);
 
     return Scaffold(
       drawer: SizedBox(
@@ -54,9 +60,10 @@ class Principale extends StatelessWidget {
             decoration: BoxDecoration(
                 border: Border.all(color: Colors.blue),
                 borderRadius: BorderRadius.circular(6)),
-            // child: JsonTable(json),
           ),
+          JsonTable(json),
         ],
+
         // child: ElevatedButton(
         //   onPressed: () {
         //     GetFeesheets(php_session_id, context);
@@ -66,6 +73,23 @@ class Principale extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<String> fetch(String php_session_id) async {
+  final response = await http.post(
+    Uri.parse('https://api.gsb.best/'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'api': 'multi_view_all_feesheets',
+      'php_session_id': php_session_id
+    }),
+  );
+
+  String TEST_VAR_DSFGD = response.body;
+  print(TEST_VAR_DSFGD);
+  return TEST_VAR_DSFGD;
 }
 
 void Logout(String php_session_id, BuildContext context) async {
