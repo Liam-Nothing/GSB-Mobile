@@ -50,7 +50,7 @@ void createData(String username, String password, BuildContext context) async {
     if (jsonDecode(response.body)["message"] == 'Good password') {
       String php_session_id = jsonDecode(response.body)["php_session_id"];
       //Automatical redirect
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance?.addPostFrameCallback((_) {
         Navigator.push(
             context,
             MaterialPageRoute(

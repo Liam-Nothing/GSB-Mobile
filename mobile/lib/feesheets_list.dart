@@ -8,6 +8,7 @@ import 'package:mobile/main.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:json_table/json_table.dart';
 
 class Principale extends StatelessWidget {
   final String php_session_id;
@@ -20,6 +21,8 @@ class Principale extends StatelessWidget {
   Widget build(BuildContext context) {
     //php_session_id print
     debugPrint('Key is : ' + php_session_id);
+    final String jsonSample = '[{"id":1},{"id":2}]';
+    var json = jsonDecode(GetFeesheets(php_session_id, context));
 
     return Scaffold(
       drawer: const SizedBox(
@@ -29,20 +32,17 @@ class Principale extends StatelessWidget {
         ),
       ),
       appBar: AppBar(
-        toolbarHeight: 70,
-        actions: [
-          IconButton(
-            onPressed: () {
-              Logout(php_session_id, context);
-              Navigator.pop(context);
-            },
-            icon: const Icon(Icons.logout_rounded),
-          )
-        ],
-        title: Text(
-          'Feesheets',
-        ),
-      ),
+          toolbarHeight: 70,
+          actions: [
+            IconButton(
+              onPressed: () {
+                Logout(php_session_id, context);
+                Navigator.pop(context);
+              },
+              icon: const Icon(Icons.logout_rounded),
+            )
+          ],
+          title: const Text('Feesheets')),
       body: GestureDetector(
         onTap: () {
           Navigator.push(
@@ -54,10 +54,13 @@ class Principale extends StatelessWidget {
           decoration: BoxDecoration(
               border: Border.all(color: Colors.blue),
               borderRadius: BorderRadius.circular(6)),
-          child: ElevatedButton(
-            onPressed: () {},
-            child: const Text('Table !'),
-          ),
+          child: JsonTable(json),
+          // child: ElevatedButton(
+          //   onPressed: () {
+          //     GetFeesheets(php_session_id, context);
+          //   },
+          //   child: const Text('Table !'),
+          // ),
         ),
       ),
     );
@@ -78,7 +81,7 @@ void Logout(String php_session_id, BuildContext context) async {
 
   if (response.statusCode != 200) {
     Fluttertoast.showToast(
-      msg: "Failed to create Data array.",
+      msg: "Failed request...",
       toastLength: Toast.LENGTH_SHORT,
       gravity: ToastGravity.BOTTOM,
       timeInSecForIosWeb: 2,
@@ -90,4 +93,34 @@ void Logout(String php_session_id, BuildContext context) async {
   } else {
     debugPrint(response.body);
   }
+}
+
+Future<String> GetFeesheets(String php_session_id, BuildContext context) async {
+  final response = await http.post(
+    Uri.parse('https://api.gsb.best/'),
+    headers: <String, String>{
+      'Content-Type': 'application/json; charset=UTF-8',
+    },
+    body: jsonEncode(<String, String>{
+      'api': 'multi_view_all_feesheets',
+      'php_session_id': php_session_id
+    }),
+  );
+
+  if (response.statusCode != 200) {
+    Fluttertoast.showToast(
+      msg: "Failed request...",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.BOTTOM,
+      timeInSecForIosWeb: 2,
+      webPosition: "center",
+      backgroundColor: Colors.red,
+      webBgColor: "#f00",
+      textColor: Colors.white,
+    );
+  } else {
+    return response.body;
+  }
+
+  return "error";
 }
