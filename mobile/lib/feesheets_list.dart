@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mobile/login.dart';
 import 'package:mobile/constants.dart';
-import 'package:mobile/notes_de_frais.dart';
+import 'package:mobile/add_feesheet.dart';
 import 'package:mobile/feesheets_list.dart';
 import 'package:mobile/main.dart';
 import 'dart:convert';
@@ -28,11 +28,11 @@ class Principale extends StatelessWidget {
     // var json = (GetFeesheets(php_session_id));
     // debugPrint(jsonSample);
 
-    var TEST_VAR_PHDFG = fetch(php_session_id);
+    // var TEST_VAR_PHDFG = fetch(php_session_id);
 
-    print(TEST_VAR_PHDFG);
-    print("====>");
-    print(TEST_VAR_PHDFG);
+    // print(TEST_VAR_PHDFG);
+    // print("====>");
+    // print(TEST_VAR_PHDFG);
 
     return Scaffold(
       drawer: SizedBox(
@@ -54,25 +54,46 @@ class Principale extends StatelessWidget {
             )
           ],
           title: const Text('Feesheets')),
-      body: Column(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-                border: Border.all(color: Colors.blue),
-                borderRadius: BorderRadius.circular(6)),
-          ),
-          JsonTable(json),
-        ],
+      body: Center(child: buildFutureBuilder()),
+      // Column(
+      //   children: [
+      //     Container(
+      //       decoration: BoxDecoration(
+      //           border: Border.all(color: Colors.blue),
+      //           borderRadius: BorderRadius.circular(6)),
+      //     ),
+      //     JsonTable(json),
+      //   ],
 
-        // child: ElevatedButton(
-        //   onPressed: () {
-        //     GetFeesheets(php_session_id, context);
-        //   },
-        //   child: const Text('Table !'),
-        // ),
-      ),
+      //   // child: ElevatedButton(
+      //   //   onPressed: () {
+      //   //     GetFeesheets(php_session_id, context);
+      //   //   },
+      //   //   child: const Text('Table !'),
+      //   // ),
+      // ),
     );
   }
+}
+
+FutureBuilder<Principale> buildFutureBuilder() {
+  return FutureBuilder<Principale>(
+    builder: (context, snapshot) {
+      return Column(
+        children: [
+          Text('Welcome !'),
+          ElevatedButton(onPressed: () {}, child: Text("Page d'accueil")),
+          ElevatedButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                    context, MaterialPageRoute(builder: (context) => Login()));
+              },
+              style: ElevatedButton.styleFrom(primary: Colors.red),
+              child: Text('Se déconnecter')),
+        ],
+      );
+    },
+  );
 }
 
 Future<String> fetch(String php_session_id) async {
@@ -178,8 +199,14 @@ class DrawerContent extends StatelessWidget {
           ListTile(
             leading: Icon(Icons.border_color),
             title: Text('New Feesheets'),
-            onTap: () =>
-                {Logout(php_session_id, context), Navigator.pop(context)},
+            onTap: () => {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => Feesheets(
+                            php_session_id: php_session_id,
+                          )))
+            },
           ),
           // ListTile(
           //   leading: Icon(Icons.exit_to_app),

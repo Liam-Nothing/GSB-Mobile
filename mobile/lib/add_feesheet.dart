@@ -7,6 +7,11 @@ import 'package:date_field/date_field.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class Feesheets extends StatefulWidget {
+  final String php_session_id;
+
+  // receive data from the FirstScreen as a parameter
+  Feesheets({Key? key, required this.php_session_id}) : super(key: key);
+
   @override
   State<Feesheets> createState() => _FeesheetsState();
 }
@@ -16,25 +21,9 @@ class _FeesheetsState extends State<Feesheets> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        drawer: Container(
-          width: 500,
-          child: Drawer(
-              // child: DrawerContent(),
-              ),
-        ),
         appBar: AppBar(
           toolbarHeight: 70,
-          actions: [
-            IconButton(
-              onPressed: () => Navigator.pop(context),
-              icon: Icon(Icons.home),
-            )
-          ],
-          title: Center(
-              child: Text(
-            'Nouvelle note de frais',
-            style: kTitreLabelP,
-          )),
+          title: const Text('New feesheets'),
         ),
         body: Center(child: FeesheetsForm()),
       ),
